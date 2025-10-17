@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenVid - Gerador de Vídeos Animados por IA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            min-height: 100vh;
+        }
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .btn-primary {
+            background-color: #87ceeb;
+            border-color: #87ceeb;
+            color: #333333;
+        }
+        .btn-primary:hover {
+            background-color: #5db9db;
+            border-color: #5db9db;
+        }
+        .video-preview {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e9ecef;
+        }
+        .prompt-suggestion {
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #333333;
+        }
+        .prompt-suggestion:hover {
+            background-color: #e9f7ff;
+            border-color: #87ceeb;
+        }
+        video {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            margin: 5px;
+            border: 2px solid #87ceeb;
+            border-radius: 5px;
+        }
+        .upload-area {
+            border: 2px dashed #87ceeb;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+        }
+        .upload-area:hover {
+            background-color: #e9f7ff;
+        }
+        .upload-area.dragover {
+            background-color: #d0efff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-bold">GenVid</h1>
+            <p class="lead">Transforme suas ideias em vídeos animados com inteligência artificial</p>
+        </header>
+
+        <div class="row">
+            <!-- Registration/Login Section -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-4">
+                    <h3 id="auth-title">Registrar-se</h3>
+                    <form id="auth-form">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nome de Usuário</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" id="auth-button">Registrar</button>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <small>Já tem uma conta? <a href="#" id="toggle-auth">Entrar</a></small>
+                    </div>
+                </div>
+
+                <!-- API Keys Section -->
+                <div class="card p-4 mt-4" id="api-keys-section" style="display: none;">
+                    <h4>Suas Chaves de API</h4>
+                    <div id="api-keys-list"></div>
+                    <button class="btn btn-sm btn-outline-primary mt-2" id="generate-api-key">Gerar Nova Chave</button>
+                </div>
+            </div>
+
+            <!-- Video Generation Section -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-4">
+                    <h3>Gerar Vídeo</h3>
+                    <div class="mb-3">
+                        <label for="prompt" class="form-label">Descreva seu vídeo</label>
+                        <textarea class="form-control" id="prompt" rows="4" placeholder="Ex: Um dragão voando sobre uma montanha mágica ao pôr do sol"></textarea>
+                    </div>
+                    
+                    <!-- Image Upload Section -->
+                    <div class="mb-3">
+                        <label class="form-label">Imagens de Referência (opcional)</label>
+                        <div class="upload-area" id="upload-area">
+                            <p class="mb-1">Clique ou arraste imagens para upload</p>
+                            <small class="text-muted">Formatos suportados: JPG, PNG, GIF (máx. 16MB)</small>
+                            <input type="file" id="image-upload" accept="image/*" multiple style="display: none;">
+                        </div>
+                        <div id="image-previews" class="d-flex flex-wrap"></div>
+                        <div id="upload-status" class="mt-2"></div>
+                    </div>
+                    
+                    <!-- Suggested Prompts -->
+                    <div class="mb-3">
+                        <label class="form-label">Sugestões de Prompts:</label>
+                        <div id="suggested-prompts" class="d-grid gap-2"></div>
+                    </div>
+                    
+                    <button class="btn btn-primary w-100" id="generate-btn" disabled>
+                        <span id="generate-text">Gerar Vídeo</span>
+                        <span id="generate-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                    </button>
+                </div>
+
+                <!-- Video Preview -->
+                <div class="card p-4 mt-4">
+                    <h4>Prévia do Vídeo</h4>
+                    <div class="video-preview" id="video-preview">
+                        <p class="text-muted">Seu vídeo gerado aparecerá aqui</p>
+                    </div>
+                    <div class="mt-3" id="video-result" style="display: none;">
+                        <a href="#" class="btn btn-primary w-100" id="download-btn">Baixar Vídeo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let authToken = localStorage.getItem('authToken');
+        let apiKey = localStorage.getItem('apiKey');
+        let uploadedImages = [];
+
+        // DOM Elements
+        const authForm = document.getElementById('auth-form');
+        const authTitle = document.getElementById('auth-title');
+        const authButton = document.getElementById('auth-button');
+        const toggleAuth = document.getElementById('toggle-auth');
+        const generateBtn = document.getElementById('generate-btn');
+        const promptInput = document.getElementById('prompt');
+        const suggestedPrompts = document.getElementById('suggested-prompts');
+        const videoPreview = document.getElementById('video-preview');
+        const videoResult = document.getElementById('video-result');
+        const downloadBtn = document.getElementById('download-btn');
+        const generateText = document.getElementById('generate-text');
+        const generateSpinner = document.getElementById('generate-spinner');
+        const apiKeysSection = document.getElementById('api-keys-section');
+        const apiKeysList = document.getElementById('api-keys-list');
+        const generateApiKeyBtn = document.getElementById('generate-api-key');
+        const uploadArea = document.getElementById('upload-area');
+        const imageUpload = document.getElementById('image-upload');
+        const imagePreviews = document.getElementById('image-previews');
+        const uploadStatus = document.getElementById('upload-status');
+
+        // Toggle between login and register
+        let isLoginMode = false;
+        toggleAuth.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            authTitle.textContent = isLoginMode ? 'Entrar' : 'Registrar-se';
+            authButton.textContent = isLoginMode ? 'Entrar' : 'Registrar';
+            document.querySelector('label[for="username"]').parentElement.style.display = 
+                isLoginMode ? 'none' : 'block';
+        });
+
+        // Handle authentication
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(authForm);
+            const userData = {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            
+            try {
+                const endpoint = isLoginMode ? '/api/login' : '/api/register';
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(isLoginMode ? 
+                        { email: userData.email, password: userData.password } : 
+                        userData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (isLoginMode) {
+                        authToken = data.token;
+                        localStorage.setItem('authToken', authToken);
+                        // Get API key after login
+                        await fetchApiKeys();
+                    } else {
+                        apiKey = data.api_key;
+                        localStorage.setItem('apiKey', apiKey);
+                        alert('Registro bem-sucedido! Agora você pode fazer login.');
+                        toggleAuth.click(); // Switch to login mode
+                    }
+                    updateUIState();
+                } else {
+                    alert(data.message || 'Erro na autenticação');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro. Por favor, tente novamente.');
+            }
+        });
+
+        // Fetch suggested prompts
+        async function fetchSuggestedPrompts() {
+            try {
+                const response = await fetch('/api/suggested-prompts');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    suggestedPrompts.innerHTML = '';
+                    data.prompts.forEach(prompt => {
+                        const button = document.createElement('button');
+                        button.className = 'btn btn-outline-primary prompt-suggestion';
+                        button.textContent = prompt;
+                        button.addEventListener('click', () => {
+                            promptInput.value = prompt;
+                        });
+                        suggestedPrompts.appendChild(button);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar sugestões:', error);
+            }
+        }
+
+        // Fetch user API keys
+        async function fetchApiKeys() {
+            if (!authToken) return;
+            
+            try {
+                const response = await fetch('/api/user/api-keys', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    apiKeysList.innerHTML = '';
+                    data.api_keys.forEach(key => {
+                        const keyElement = document.createElement('div');
+                        keyElement.className = 'alert alert-secondary';
+                        keyElement.innerHTML = `
+                            <small>
+                                <strong>Chave:</strong> ${key.key.substring(0, 10)}... 
+                                <strong>Criada em:</strong> ${new Date(key.created_at).toLocaleDateString('pt-BR')}
+                            </small>
+                        `;
+                        apiKeysList.appendChild(keyElement);
+                    });
+                    apiKeysSection.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar chaves de API:', error);
+            }
+        }
+
+        // Image upload functionality
+        uploadArea.addEventListener('click', () => {
+            imageUpload.click();
+        });
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length) {
+                handleImageUpload(e.dataTransfer.files);
+            }
+        });
+
+        imageUpload.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleImageUpload(e.target.files);
+            }
+        });
+
+        async function handleImageUpload(files) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Check file type
+                if (!file.type.match('image.*')) {
+                    alert('Por favor, selecione apenas arquivos de imagem.');
+                    continue;
+                }
+                
+                // Upload image
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                try {
+                    uploadStatus.innerHTML = `<span class="text-primary">Enviando ${file.name}...</span>`;
+                    
+                    const response = await fetch('/api/upload-image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Add to uploaded images array
+                        uploadedImages.push(data.filename);
+                        
+                        // Show preview
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.className = 'image-preview';
+                            img.title = file.name;
+                            imagePreviews.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                        
+                        uploadStatus.innerHTML = `<span class="text-success">Imagem ${file.name} enviada com sucesso!</span>`;
+                    } else {
+                        uploadStatus.innerHTML = `<span class="text-danger">Erro ao enviar ${file.name}: ${data.message}</span>`;
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    uploadStatus.innerHTML = `<span class="text-danger">Erro ao enviar ${file.name}</span>`;
+                }
+            }
+        }
+
+        // Generate video
+        generateBtn.addEventListener('click', async () => {
+            if (!promptInput.value.trim()) {
+                alert('Por favor, insira um prompt para gerar o vídeo.');
+                return;
+            }
+            
+            if (!authToken) {
+                alert('Você precisa estar logado para gerar vídeos.');
+                return;
+            }
+            
+            // Show loading state
+            generateText.style.display = 'none';
+            generateSpinner.style.display = 'inline-block';
+            generateBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/generate-video', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ 
+                        prompt: promptInput.value,
+                        reference_images: uploadedImages
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Show video preview
+                    videoPreview.innerHTML = `
+                        <video controls>
+                            <source src="${data.video_url}" type="video/mp4">
+                            Seu navegador não suporta a tag de vídeo.
+                        </video>
+                    `;
+                    videoResult.style.display = 'block';
+                    downloadBtn.href = data.download_url;
+                    downloadBtn.download = `video-${data.video_id}.mp4`;
+                    
+                    // Clear uploaded images
+                    uploadedImages = [];
+                    imagePreviews.innerHTML = '';
+                } else {
+                    alert(data.message || 'Erro ao gerar vídeo');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro ao gerar o vídeo. Por favor, tente novamente.');
+            } finally {
+                // Reset loading state
+                generateText.style.display = 'inline';
+                generateSpinner.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        });
+
+        // Generate new API key
+        generateApiKeyBtn.addEventListener('click', async () => {
+            if (!authToken) {
+                alert('Você precisa estar logado para gerar uma nova chave de API.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/user/generate-api-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(`Nova chave de API gerada com sucesso: ${data.api_key}`);
+                    // Refresh the API keys list
+                    fetchApiKeys();
+                } else {
+                    alert(data.message || 'Erro ao gerar nova chave de API');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro ao gerar a nova chave de API. Por favor, tente novamente.');
+            }
+        });
+
+        // Update UI based on authentication state
+        function updateUIState() {
+            if (authToken) {
+                generateBtn.disabled = false;
+                apiKeysSection.style.display = 'block';
+                fetchApiKeys();
+            } else {
+                generateBtn.disabled = true;
+                apiKeysSection.style.display = 'none';
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchSuggestedPrompts();
+            updateUIState();
+        });
+    </script>
+</body>
+</html>

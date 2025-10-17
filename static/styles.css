@@ -1,0 +1,153 @@
+/* Estilos personalizados para GenVid - Tema Branco e Azul Bebê */
+
+/* Estilos gerais do corpo */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff; /* Branco */
+    color: #333333; /* Cinza escuro para melhor leitura */
+}
+
+/* Estilo para a marca da navbar */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Seção hero */
+.hero-section {
+    padding: 4rem 0;
+    text-align: center;
+}
+
+/* Seção de funcionalidades */
+.features-section {
+    padding: 3rem 0;
+}
+
+/* Cartão de funcionalidade */
+.feature-card {
+    text-align: center;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    background-color: #f8f9fa; /* Cinza muito claro */
+    border: 1px solid #e9ecef; /* Borda cinza claro */
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: #87ceeb; /* Azul bebê */
+}
+
+/* Rodapé */
+.footer {
+    padding: 2rem 0;
+    text-align: center;
+    background-color: #f8f9fa; /* Cinza muito claro */
+    border-top: 1px solid #e9ecef; /* Borda cinza claro */
+}
+
+/* Estilos específicos do GenVid */
+.card {
+    background-color: #ffffff; /* Branco */
+    border: 1px solid #e9ecef; /* Borda cinza claro */
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.btn-primary {
+    background-color: #87ceeb; /* Azul bebê */
+    border-color: #87ceeb; /* Azul bebê */
+    color: #333333; /* Cinza escuro */
+}
+
+.btn-primary:hover {
+    background-color: #5db9db; /* Azul bebê mais escuro */
+    border-color: #5db9db; /* Azul bebê mais escuro */
+}
+
+.btn-outline-light {
+    border-color: #87ceeb; /* Azul bebê */
+    color: #87ceeb; /* Azul bebê */
+}
+
+.btn-outline-light:hover {
+    background-color: #87ceeb; /* Azul bebê */
+    color: #ffffff; /* Branco */
+}
+
+.video-preview {
+    background-color: #f8f9fa; /* Cinza muito claro */
+    border-radius: 10px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e9ecef; /* Borda cinza claro */
+}
+
+.prompt-suggestion {
+    cursor: pointer;
+    transition: all 0.3s;
+    background-color: #f8f9fa; /* Cinza muito claro */
+    border: 1px solid #e9ecef; /* Borda cinza claro */
+    color: #333333; /* Cinza escuro */
+}
+
+.prompt-suggestion:hover {
+    background-color: #e9f7ff; /* Azul bebê muito claro */
+    border-color: #87ceeb; /* Azul bebê */
+}
+
+.image-preview {
+    max-width: 100px;
+    max-height: 100px;
+    margin: 5px;
+    border: 2px solid #87ceeb; /* Azul bebê */
+    border-radius: 5px;
+}
+
+.upload-area {
+    border: 2px dashed #87ceeb; /* Azul bebê */
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background-color: #f8f9fa; /* Cinza muito claro */
+}
+
+.upload-area:hover {
+    background-color: #e9f7ff; /* Azul bebê muito claro */
+}
+
+.upload-area.dragover {
+    background-color: #d0efff; /* Azul bebê claro */
+}
+
+.alert-secondary {
+    background-color: #f8f9fa; /* Cinza muito claro */
+    border: 1px solid #e9ecef; /* Borda cinza claro */
+    color: #333333; /* Cinza escuro */
+}
+
+.form-control {
+    border: 1px solid #ced4da; /* Borda padrão */
+}
+
+.form-control:focus {
+    border-color: #87ceeb; /* Azul bebê */
+    box-shadow: 0 0 0 0.2rem rgba(135, 206, 235, 0.25); /* Sombra azul bebê */
+}
+
+a {
+    color: #87ceeb; /* Azul bebê */
+    text-decoration: none;
+}
+
+a:hover {
+    color: #5db9db; /* Azul bebê mais escuro */
+}
