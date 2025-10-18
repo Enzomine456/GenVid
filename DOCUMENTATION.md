@@ -141,6 +141,78 @@ O Glitch automaticamente:
 2. Inicia a aplicação usando o comando especificado no `Procfile`
 3. Fornece uma URL pública para acessar a aplicação
 
+## Como Implantar no Fly.io
+
+Para implantar o GenVid no Fly.io, siga estas etapas:
+
+### 1. Instalar o Fly.io CLI
+
+Primeiro, instale o Fly.io CLI seguindo as instruções em [https://fly.io/docs/getting-started/installing-flyctl/](https://fly.io/docs/getting-started/installing-flyctl/)
+
+### 2. Fazer Login
+
+Faça login na sua conta Fly.io:
+
+```bash
+flyctl auth login
+```
+
+### 3. Configurar o App
+
+Navegue até o diretório do projeto e crie um novo app:
+
+```bash
+flyctl launch
+```
+
+Siga as instruções:
+- Escolha um nome para seu app
+- Selecione uma região
+- Não implante ainda quando perguntado
+
+### 4. Configurar Variáveis de Ambiente
+
+Configure a chave secreta para a aplicação:
+
+```bash
+flyctl secrets set SECRET_KEY="sua-chave-secreta-segura-aqui"
+```
+
+### 5. Implantar
+
+Implante a aplicação:
+
+```bash
+flyctl deploy
+```
+
+### 6. Acessar
+
+Abra a aplicação no navegador:
+
+```bash
+flyctl open
+```
+
+### Configurações Adicionais
+
+O arquivo `fly.toml` já está configurado com:
+- Dockerfile para construção da imagem
+- Porta 8080 para o serviço HTTP
+- Configurações de auto scaling
+
+Se precisar de um banco de dados persistente, considere usar o Fly.io PostgreSQL:
+
+```bash
+flyctl postgres create
+```
+
+E então conectar à sua aplicação:
+
+```bash
+flyctl postgres attach NOME_DO_SEU_BANCO_DE_DADOS
+```
+
 ## Desenvolvimento Local
 
 ### Requisitos

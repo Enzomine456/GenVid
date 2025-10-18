@@ -43,7 +43,7 @@ class VideoRequest(db.Model):
     reference_images = db.Column(db.Text, nullable=True)  # JSON list of image filenames
     status = db.Column(db.String(50), default='pending')  # pending, processing, completed, failed
     result_url = db.Column(db.String(255), nullable=True)
-    metadata = db.Column(db.Text, nullable=True)  # Store additional data as JSON
+    request_metadata = db.Column(db.Text, nullable=True)  # Store additional data as JSON (renamed from metadata)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

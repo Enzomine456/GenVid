@@ -154,7 +154,7 @@ def generate_video():
         # Update request status
         video_request.status = 'completed'
         video_request.result_url = f"/videos/{video_id}"
-        video_request.metadata = json.dumps({
+        video_request.request_metadata = json.dumps({
             'prompt': prompt,
             'reference_images': reference_images,
             'duration': 10  # seconds
@@ -243,5 +243,13 @@ def generate_api_key():
         'api_key': api_key
     }), 201
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint"""
+    return jsonify({'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()}), 200
+
+# For local development and traditional servers
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    # Get port from environment variable or default to 8080
+    port = int(os.environ.get('PORT', 8080))
+    app.run(debug=False, host='0.0.0.0', port=port)
